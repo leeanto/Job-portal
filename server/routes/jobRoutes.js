@@ -1,11 +1,11 @@
 import express from 'express';
+import { protect } from '../middleware/authMiddleware.js';
 import Job from '../models/Job.js';
-import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Create Job (Employer/Admin only)
-router.post('/', authMiddleware, async (req, res) => {
+// Create job
+router.post('/', protect, async (req, res) => {
   try {
     if (!['employer', 'admin'].includes(req.user.role)) {
       return res.status(403).json({ message: 'Not authorized' });
@@ -17,16 +17,6 @@ router.post('/', authMiddleware, async (req, res) => {
     });
 
     res.status(201).json(job);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get All Jobs
-router.get('/', async (req, res) => {
-  try {
-    const jobs = await Job.find().populate('postedBy', 'name email');
-    res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

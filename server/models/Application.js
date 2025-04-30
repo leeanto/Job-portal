@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 
 const applicationSchema = mongoose.Schema({
-  job: {
+  job: { 
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Job',
     required: true
   },
-  applicant: {
+  applicant: { 
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
@@ -20,9 +20,7 @@ const applicationSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  resumeUrl: {
-    type: String
-  }
+  resumeUrl: String
 }, { timestamps: true });
 
 export default mongoose.model('Application', applicationSchema);

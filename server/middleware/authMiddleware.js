@@ -1,12 +1,17 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-const protect = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) throw new Error('No token provided');
+export const protect = async (req, res, next) => {
+  let token;
 
-    const decoded = jwt.verify(token, 'dev_secret_123');
+  if (req.headers.authorization?.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) return res.status(401).json({ message: 'Not authorized' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret_123');
     req.user = await User.findById(decoded.id).select('-password');
     next();
   } catch (error) {
@@ -14,4 +19,7 @@ const protect = async (req, res, next) => {
   }
 };
 
-export default protect;
+export const adminCheck = (req, res, next) => {
+  if (req.user?.role !== 'admin') return res.status(403).json({ message: 'Admin access required' });
+  next();
+};
